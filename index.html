@@ -4,28 +4,28 @@
   <meta charset="UTF-8">
   <title>Controle de Cargas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Fonte mais clean -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Fonte premium -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="app-shell">
+
   <!-- Topbar -->
   <header class="topbar">
-    <button class="icon-button" id="menu-toggle" aria-label="Abrir menu">
-      ☰
-    </button>
+    <button class="icon-button" id="menu-toggle">☰</button>
+
     <div class="topbar-title">
       Controle de Cargas
-      <span class="topbar-subtitle">Painel operacional</span>
+      <span class="topbar-subtitle">Painel Operacional</span>
     </div>
   </header>
 
-  <!-- Layout principal -->
   <div class="layout">
+
     <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
       <div class="sidebar-header">
@@ -37,32 +37,23 @@
       </div>
 
       <div class="sidebar-nav">
-        <button class="nav-item active" data-page="dashboard">
-          🏠 <span>Dashboard</span>
-        </button>
-        <button class="nav-item" data-page="transportadoras">
-          🚚 <span>Transportadoras</span>
-        </button>
-        <button class="nav-item" data-page="cargas">
-          📦 <span>Cargas</span>
-        </button>
-        <button class="nav-item" data-page="nova-carga">
-          ➕ <span>Nova Carga</span>
-        </button>
+        <button class="nav-item active" data-page="dashboard">🏠 <span>Dashboard</span></button>
+        <button class="nav-item" data-page="transportadoras">🚚 <span>Transportadoras</span></button>
+        <button class="nav-item" data-page="cargas">📦 <span>Cargas</span></button>
+        <button class="nav-item" data-page="nova-carga">➕ <span>Nova Carga</span></button>
       </div>
     </nav>
 
-    <!-- Backdrop (mobile) -->
     <div class="backdrop" id="backdrop"></div>
 
-    <!-- Conteúdo -->
+    <!-- Main -->
     <main class="main">
       <div class="container">
 
         <!-- DASHBOARD -->
         <section id="page-dashboard" class="page visible">
-          <h1>Resumo geral</h1>
-          <p class="page-subtitle">Visão rápida das transportadoras e cargas.</p>
+          <h1>Resumo Geral</h1>
+          <p class="page-subtitle">Visão rápida das operações.</p>
 
           <div class="grid-cards">
             <div class="card metric-card">
@@ -104,28 +95,28 @@
         <!-- TRANSPORTADORAS -->
         <section id="page-transportadoras" class="page">
           <h1>Transportadoras</h1>
-          <p class="page-subtitle">Cadastro e consulta de transportadoras.</p>
+          <p class="page-subtitle">Cadastro e consulta.</p>
 
           <div class="grid-two">
             <div class="card">
-              <div class="card-header">
-                <h2>Novo cadastro</h2>
-              </div>
+              <h2>Novo Cadastro</h2>
+
               <div class="form-group">
-                <label for="transp-nome">Nome da transportadora</label>
+                <label>Nome</label>
                 <input id="transp-nome" placeholder="Ex: MV Transportes">
               </div>
+
               <div class="form-group">
-                <label for="transp-codigo">Código</label>
+                <label>Código</label>
                 <input id="transp-codigo" type="number" placeholder="Ex: 97">
               </div>
-              <button class="btn-primary" id="btn-add-transp">Salvar transportadora</button>
+
+              <button id="btn-add-transp" class="btn-primary">Salvar</button>
             </div>
 
             <div class="card">
-              <div class="card-header">
-                <h2>Lista de transportadoras</h2>
-              </div>
+              <h2>Lista</h2>
+
               <div class="table-wrapper">
                 <table class="table">
                   <thead>
@@ -144,12 +135,11 @@
         <!-- CARGAS -->
         <section id="page-cargas" class="page">
           <h1>Cargas</h1>
-          <p class="page-subtitle">Todas as cargas registradas no sistema.</p>
+          <p class="page-subtitle">Todas as cargas registradas.</p>
 
           <div class="card">
-            <div class="card-header">
-              <h2>Cargas registradas</h2>
-            </div>
+            <h2>Lista de Cargas</h2>
+
             <div class="table-wrapper">
               <table class="table">
                 <thead>
@@ -173,49 +163,53 @@
         <!-- NOVA CARGA -->
         <section id="page-nova-carga" class="page">
           <h1>Nova Carga</h1>
-          <p class="page-subtitle">Vincule a carga a uma transportadora já cadastrada.</p>
+          <p class="page-subtitle">Preencha os dados abaixo.</p>
 
           <div class="card">
-            <div class="card-header">
-              <h2>Identificação da transportadora</h2>
-            </div>
+
+            <h2>Buscar Transportadora</h2>
+
             <div class="form-inline">
               <div class="form-group">
-                <label for="codigo-busca">Código da transportadora</label>
+                <label>Código</label>
                 <input id="codigo-busca" type="number" placeholder="Ex: 97">
               </div>
-              <button class="btn-secondary" id="btn-buscar-transp">Buscar</button>
+
+              <button id="btn-buscar-transp" class="btn-secondary">Buscar</button>
             </div>
 
-            <div id="form-carga" class="form-carga hidden">
+            <div id="form-carga" class="hidden">
+
               <div class="found-pill">
-                Transportadora selecionada:
-                <strong id="nome-transp"></strong>
+                Transportadora: <strong id="nome-transp"></strong>
               </div>
 
               <div class="grid-two">
                 <div>
                   <div class="form-group">
-                    <label for="num-carga">Número da carga</label>
-                    <input id="num-carga" placeholder="Ex: 12345">
+                    <label>Número da carga</label>
+                    <input id="num-carga">
                   </div>
+
                   <div class="form-group">
-                    <label for="total-pedidos">Total de pedidos</label>
+                    <label>Total de pedidos</label>
                     <input id="total-pedidos" type="number">
                   </div>
+
                   <div class="form-group">
-                    <label for="total-volumes">Total de volumes</label>
+                    <label>Total de volumes</label>
                     <input id="total-volumes" type="number">
                   </div>
                 </div>
 
                 <div>
                   <div class="form-group">
-                    <label for="destino">Destino / Cidade</label>
-                    <input id="destino" placeholder="Ex: São Paulo - SP">
+                    <label>Destino</label>
+                    <input id="destino">
                   </div>
+
                   <div class="form-group">
-                    <label for="status">Status da carga</label>
+                    <label>Status</label>
                     <select id="status">
                       <option value="aberto">ABERTO</option>
                       <option value="fechado">FECHADO</option>
@@ -225,25 +219,29 @@
               </div>
 
               <div class="form-group">
-                <label for="observacao">Observações</label>
-                <textarea id="observacao" rows="2"></textarea>
+                <label>Observações</label>
+                <textarea id="observacao"></textarea>
               </div>
 
               <div class="form-group">
-                <label for="problemas">Problemas</label>
-                <textarea id="problemas" rows="2"></textarea>
+                <label>Problemas</label>
+                <textarea id="problemas"></textarea>
               </div>
 
-              <button class="btn-primary" id="btn-salvar-carga">Salvar carga</button>
+              <button id="btn-salvar-carga" class="btn-primary">Salvar</button>
+
             </div>
           </div>
         </section>
 
       </div>
     </main>
+
   </div>
+
 </div>
 
 <script src="script.js"></script>
+
 </body>
 </html>

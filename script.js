@@ -1,37 +1,28 @@
-// Estado em memória
+// ================================
+// ESTADO DO SISTEMA
+// ================================
 let transportadoras = JSON.parse(localStorage.getItem("transportadoras_v1") || "[]");
 let cargas = JSON.parse(localStorage.getItem("cargas_v1") || "[]");
 
 let transportadoraSelecionada = null;
 let cargaEditandoId = null;
 
-/* Utilitários de storage */
+// ================================
+// SALVAR NO LOCALSTORAGE
+// ================================
 function salvarEstado() {
   localStorage.setItem("transportadoras_v1", JSON.stringify(transportadoras));
   localStorage.setItem("cargas_v1", JSON.stringify(cargas));
 }
 
-/* Troca de página */
-function mostrarPagina(pageId) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("visible"));
-  document.getElementById("page-" + pageId).classList.add("visible");
-
-  document.querySelectorAll(".nav-item").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.page === pageId);
-  });
-
-  // Atualiza dashboard ao abrir
-  if (pageId === "dashboard") {
-    atualizarDashboard();
-  }
-}
-
-/* Sidebar mobile */
+// ================================
+// MENU LATERAL (ABRIR/FECHAR)
+// ================================
 function configurarMenu() {
   const body = document.body;
-  const menuToggle = document.getElementById("menu-toggle");
-  const sidebar = document.getElementById("sidebar");
+  const toggle = document.getElementById("menu-toggle");
   const backdrop = document.getElementById("backdrop");
+  const sidebar = document.getElementById("sidebar");
 
   function abrir() {
     body.classList.add("sidebar-open");
@@ -41,14 +32,14 @@ function configurarMenu() {
     body.classList.remove("sidebar-open");
   }
 
-  menuToggle.addEventListener("click", () => {
+  toggle.addEventListener("click", () => {
     if (body.classList.contains("sidebar-open")) fechar();
     else abrir();
   });
 
   backdrop.addEventListener("click", fechar);
 
-  // Fechar ao clicar em item de menu no mobile
+  // Fechar ao selecionar item no mobile
   document.querySelectorAll(".nav-item").forEach(btn => {
     btn.addEventListener("click", () => {
       mostrarPagina(btn.dataset.page);
@@ -57,7 +48,23 @@ function configurarMenu() {
   });
 }
 
-/* Transportadoras */
+// ================================
+// TROCAR DE PÁGINA
+// ================================
+function mostrarPagina(pageId) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("visible"));
+  document.getElementById("page-" + pageId).classList.add("visible");
+
+  document.querySelectorAll(".nav-item").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.page === pageId);
+  });
+
+  if (pageId === "dashboard") atualizarDashboard();
+}
+
+// ================================
+// LISTAR TRANSPORTADORAS
+// ================================
 function atualizarListaTransportadoras() {
   const tbody = document.getElementById("lista-transportadoras");
   tbody.innerHTML = "";
@@ -70,10 +77,11 @@ function atualizarListaTransportadoras() {
     `;
     tbody.appendChild(tr);
   });
-
-  atualizarDashboard(); // refez métrica
 }
 
+// ================================
+// ADICIONAR TRANSPORTADORA
+// ================================
 function adicionarTransportadora() {
   const nome = document.getElementById("transp-nome").value.trim();
   const codigo = document.getElementById("transp-codigo").value.trim();
@@ -94,42 +102,47 @@ function adicionarTransportadora() {
 
   document.getElementById("transp-nome").value = "";
   document.getElementById("transp-codigo").value = "";
+  atualizarDashboard();
 }
 
-/* Buscar transportadora para carga */
+// ================================
+// BUSCAR TRANSPORTADORA POR CÓDIGO
+// ================================
 function buscarTransportadora() {
   const codigo = document.getElementById("codigo-busca").value.trim();
   const formCarga = document.getElementById("form-carga");
-  const nomeTranspSpan = document.getElementById("nome-transp");
+  const nomeTransp = document.getElementById("nome-transp");
 
   if (!codigo) {
-    alert("Informe o código da transportadora.");
+    alert("Informe o código.");
     return;
   }
 
   const encontrada = transportadoras.find(t => t.codigo === codigo);
 
   if (!encontrada) {
-    alert("Transportadora não encontrada. Cadastre primeiro.");
+    alert("Transportadora não encontrada.");
     formCarga.classList.add("hidden");
     transportadoraSelecionada = null;
-    nomeTranspSpan.textContent = "";
+    nomeTransp.textContent = "";
     return;
   }
 
   transportadoraSelecionada = encontrada;
-  nomeTranspSpan.textContent = encontrada.nome + " (" + encontrada.codigo + ")";
+  nomeTransp.textContent = `${encontrada.nome} (${encontrada.codigo})`;
   formCarga.classList.remove("hidden");
 }
 
-/* Salvar/atualizar carga */
+// ================================
+// SALVAR NOVA CARGA ou EDITAR
+// ================================
 function salvarCarga() {
   if (!transportadoraSelecionada) {
-    alert("Busque primeiro a transportadora pelo código.");
+    alert("Busque a transportadora primeiro.");
     return;
   }
 
-  const numero = document.getElementById("num-carga").value.trim();
+  const cargaNumero = document.getElementById("num-carga").value.trim();
   const pedidos = document.getElementById("total-pedidos").value.trim();
   const volumes = document.getElementById("total-volumes").value.trim();
   const destino = document.getElementById("destino").value.trim();
@@ -137,20 +150,21 @@ function salvarCarga() {
   const observacao = document.getElementById("observacao").value.trim();
   const problemas = document.getElementById("problemas").value.trim();
 
-  if (!numero) {
+  if (!cargaNumero) {
     alert("Informe o número da carga.");
     return;
   }
 
-  const agora = new Date();
+  const agora = new Date().toLocaleString();
 
   if (cargaEditandoId) {
-    // Atualiza existente
+    // Editar carga existente
     const idx = cargas.findIndex(c => c.id === cargaEditandoId);
+
     if (idx !== -1) {
       cargas[idx] = {
         ...cargas[idx],
-        numero,
+        numero: cargaNumero,
         pedidos,
         volumes,
         destino,
@@ -163,20 +177,19 @@ function salvarCarga() {
     }
   } else {
     // Nova carga
-    const nova = {
+    cargas.push({
       id: Date.now(),
       transportadora: transportadoraSelecionada.nome,
       codigo: transportadoraSelecionada.codigo,
-      numero,
+      numero: cargaNumero,
       pedidos,
       volumes,
       destino,
       observacao,
       problemas,
       status,
-      dataCriacao: agora.toLocaleString()
-    };
-    cargas.push(nova);
+      dataCriacao: agora
+    });
   }
 
   salvarEstado();
@@ -185,8 +198,9 @@ function salvarCarga() {
 
   alert("Carga salva com sucesso.");
 
-  // Limpa formulário
   cargaEditandoId = null;
+
+  // Limpa formulário
   document.getElementById("num-carga").value = "";
   document.getElementById("total-pedidos").value = "";
   document.getElementById("total-volumes").value = "";
@@ -196,13 +210,15 @@ function salvarCarga() {
   document.getElementById("problemas").value = "";
 }
 
-/* Listar cargas */
+// ================================
+// LISTAR CARGAS (COM FORMATO MOBILE)
+// ================================
 function atualizarListaCargas() {
   const tbody = document.getElementById("lista-cargas");
   tbody.innerHTML = "";
 
   cargas
-    .slice() // copia
+    .slice()
     .sort((a, b) => b.id - a.id)
     .forEach(c => {
       const tr = document.createElement("tr");
@@ -211,41 +227,40 @@ function atualizarListaCargas() {
       const statusLabel = c.status === "aberto" ? "ABERTO" : "FECHADO";
 
       tr.innerHTML = `
-        <td>${c.transportadora} (${c.codigo})</td>
-        <td>${c.numero}</td>
-        <td>${c.volumes || "-"}</td>
-        <td>${c.pedidos || "-"}</td>
-        <td>${c.destino || "-"}</td>
-        <td><span class="status-chip ${statusClass}">${statusLabel}</span></td>
-        <td>${c.dataCriacao || "-"}</td>
-        <td>
+        <td data-label="Transportadora">${c.transportadora} (${c.codigo})</td>
+        <td data-label="Carga">${c.numero}</td>
+        <td data-label="Volumes">${c.volumes || "-"}</td>
+        <td data-label="Pedidos">${c.pedidos || "-"}</td>
+        <td data-label="Destino">${c.destino || "-"}</td>
+        <td data-label="Status">
+          <span class="status-chip ${statusClass}">${statusLabel}</span>
+        </td>
+        <td data-label="Data">${c.dataCriacao || "-"}</td>
+        <td data-label="Ações">
           <button class="btn-secondary btn-small" data-acao="editar" data-id="${c.id}">
             Editar
           </button>
         </td>
       `;
+
       tbody.appendChild(tr);
     });
 }
 
-/* Dashboard */
+// ================================
+// DASHBOARD
+// ================================
 function atualizarDashboard() {
-  const spanTransp = document.getElementById("metric-transportadoras");
-  const spanAbertas = document.getElementById("metric-abertas");
-  const spanFechadas = document.getElementById("metric-fechadas");
-  const tbodyDashboard = document.getElementById("dashboard-cargas");
-
-  if (!spanTransp) return; // ainda não montou DOM
-
-  spanTransp.textContent = transportadoras.length;
+  document.getElementById("metric-transportadoras").textContent = transportadoras.length;
 
   const abertas = cargas.filter(c => c.status === "aberto").length;
   const fechadas = cargas.filter(c => c.status === "fechado").length;
 
-  spanAbertas.textContent = abertas;
-  spanFechadas.textContent = fechadas;
+  document.getElementById("metric-abertas").textContent = abertas;
+  document.getElementById("metric-fechadas").textContent = fechadas;
 
-  tbodyDashboard.innerHTML = "";
+  const tbody = document.getElementById("dashboard-cargas");
+  tbody.innerHTML = "";
 
   cargas
     .slice()
@@ -262,67 +277,58 @@ function atualizarDashboard() {
         <td>${c.volumes || "-"}</td>
         <td>${c.pedidos || "-"}</td>
         <td><span class="status-chip ${statusClass}">${statusLabel}</span></td>
-        <td>${c.dataCriacao || "-"}</td>
+        <td>${c.dataCriacao}</td>
       `;
-      tbodyDashboard.appendChild(tr);
+      tbody.appendChild(tr);
     });
 }
 
-/* Editar carga */
+// ================================
+// EDITAR CARGA
+// ================================
 function prepararEdicaoCarga(id) {
-  const c = cargas.find(x => x.id === id);
-  if (!c) return;
+  const carga = cargas.find(c => c.id === id);
 
-  if (c.status === "fechado") {
-    alert("Essa carga está FECHADA e não pode ser editada.");
+  if (!carga) return;
+
+  if (carga.status === "fechado") {
+    alert("Não é possível editar uma carga fechada.");
     return;
   }
 
-  // Vai para página de nova carga
   mostrarPagina("nova-carga");
 
-  // Preenche dados
-  document.getElementById("codigo-busca").value = c.codigo;
+  document.getElementById("codigo-busca").value = carga.codigo;
   buscarTransportadora();
 
-  document.getElementById("num-carga").value = c.numero;
-  document.getElementById("total-pedidos").value = c.pedidos;
-  document.getElementById("total-volumes").value = c.volumes;
-  document.getElementById("destino").value = c.destino;
-  document.getElementById("status").value = c.status;
-  document.getElementById("observacao").value = c.observacao;
-  document.getElementById("problemas").value = c.problemas;
+  document.getElementById("num-carga").value = carga.numero;
+  document.getElementById("total-pedidos").value = carga.pedidos;
+  document.getElementById("total-volumes").value = carga.volumes;
+  document.getElementById("destino").value = carga.destino;
+  document.getElementById("status").value = carga.status;
+  document.getElementById("observacao").value = carga.observacao;
+  document.getElementById("problemas").value = carga.problemas;
 
-  cargaEditandoId = c.id;
+  cargaEditandoId = id;
 }
 
-/* Inicialização */
+// ================================
+// EVENTOS
+// ================================
 document.addEventListener("DOMContentLoaded", () => {
   configurarMenu();
 
-  // Botões
   document.getElementById("btn-add-transp").addEventListener("click", adicionarTransportadora);
   document.getElementById("btn-buscar-transp").addEventListener("click", buscarTransportadora);
   document.getElementById("btn-salvar-carga").addEventListener("click", salvarCarga);
 
-  // Ações na tabela de cargas (delegação)
-  document.getElementById("lista-cargas").addEventListener("click", (e) => {
+  document.getElementById("lista-cargas").addEventListener("click", e => {
     const btn = e.target.closest("button[data-acao='editar']");
     if (!btn) return;
-    const id = Number(btn.dataset.id);
-    prepararEdicaoCarga(id);
+    prepararEdicaoCarga(Number(btn.dataset.id));
   });
 
-  // Navegação do menu (desktop)
-  document.querySelectorAll(".nav-item").forEach(btn => {
-    btn.addEventListener("click", () => {
-      mostrarPagina(btn.dataset.page);
-    });
-  });
-
-  // Estado inicial
   atualizarListaTransportadoras();
   atualizarListaCargas();
   atualizarDashboard();
-  mostrarPagina("dashboard");
 });
