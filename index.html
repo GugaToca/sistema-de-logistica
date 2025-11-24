@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Controle de Cargas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Fonte mais clean -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- Topbar -->
+  <header class="topbar">
+    <button class="icon-button" id="menu-toggle" aria-label="Abrir menu">
+      ☰
+    </button>
+    <div class="topbar-title">
+      Controle de Cargas
+      <span class="topbar-subtitle">Painel operacional</span>
+    </div>
+  </header>
+
+  <!-- Layout principal -->
+  <div class="layout">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="app-logo">LC</div>
+        <div class="app-name">
+          <span>Logística</span>
+          <strong>Control</strong>
+        </div>
+      </div>
+
+      <div class="sidebar-nav">
+        <button class="nav-item active" data-page="dashboard">
+          🏠 <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-page="transportadoras">
+          🚚 <span>Transportadoras</span>
+        </button>
+        <button class="nav-item" data-page="cargas">
+          📦 <span>Cargas</span>
+        </button>
+        <button class="nav-item" data-page="nova-carga">
+          ➕ <span>Nova Carga</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Backdrop (mobile) -->
+    <div class="backdrop" id="backdrop"></div>
+
+    <!-- Conteúdo -->
+    <main class="main">
+      <div class="container">
+
+        <!-- DASHBOARD -->
+        <section id="page-dashboard" class="page visible">
+          <h1>Resumo geral</h1>
+          <p class="page-subtitle">Visão rápida das transportadoras e cargas.</p>
+
+          <div class="grid-cards">
+            <div class="card metric-card">
+              <span class="metric-label">Transportadoras</span>
+              <span class="metric-value" id="metric-transportadoras">0</span>
+            </div>
+            <div class="card metric-card">
+              <span class="metric-label">Cargas Abertas</span>
+              <span class="metric-value accent" id="metric-abertas">0</span>
+            </div>
+            <div class="card metric-card">
+              <span class="metric-label">Cargas Fechadas</span>
+              <span class="metric-value" id="metric-fechadas">0</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Últimas cargas</h2>
+            </div>
+            <div class="table-wrapper">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Transportadora</th>
+                    <th>Carga</th>
+                    <th>Volumes</th>
+                    <th>Pedidos</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-cargas"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- TRANSPORTADORAS -->
+        <section id="page-transportadoras" class="page">
+          <h1>Transportadoras</h1>
+          <p class="page-subtitle">Cadastro e consulta de transportadoras.</p>
+
+          <div class="grid-two">
+            <div class="card">
+              <div class="card-header">
+                <h2>Novo cadastro</h2>
+              </div>
+              <div class="form-group">
+                <label for="transp-nome">Nome da transportadora</label>
+                <input id="transp-nome" placeholder="Ex: MV Transportes">
+              </div>
+              <div class="form-group">
+                <label for="transp-codigo">Código</label>
+                <input id="transp-codigo" type="number" placeholder="Ex: 97">
+              </div>
+              <button class="btn-primary" id="btn-add-transp">Salvar transportadora</button>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h2>Lista de transportadoras</h2>
+              </div>
+              <div class="table-wrapper">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>Código</th>
+                    </tr>
+                  </thead>
+                  <tbody id="lista-transportadoras"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CARGAS -->
+        <section id="page-cargas" class="page">
+          <h1>Cargas</h1>
+          <p class="page-subtitle">Todas as cargas registradas no sistema.</p>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Cargas registradas</h2>
+            </div>
+            <div class="table-wrapper">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Transportadora</th>
+                    <th>Carga</th>
+                    <th>Volumes</th>
+                    <th>Pedidos</th>
+                    <th>Destino</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="lista-cargas"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- NOVA CARGA -->
+        <section id="page-nova-carga" class="page">
+          <h1>Nova Carga</h1>
+          <p class="page-subtitle">Vincule a carga a uma transportadora já cadastrada.</p>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Identificação da transportadora</h2>
+            </div>
+            <div class="form-inline">
+              <div class="form-group">
+                <label for="codigo-busca">Código da transportadora</label>
+                <input id="codigo-busca" type="number" placeholder="Ex: 97">
+              </div>
+              <button class="btn-secondary" id="btn-buscar-transp">Buscar</button>
+            </div>
+
+            <div id="form-carga" class="form-carga hidden">
+              <div class="found-pill">
+                Transportadora selecionada:
+                <strong id="nome-transp"></strong>
+              </div>
+
+              <div class="grid-two">
+                <div>
+                  <div class="form-group">
+                    <label for="num-carga">Número da carga</label>
+                    <input id="num-carga" placeholder="Ex: 12345">
+                  </div>
+                  <div class="form-group">
+                    <label for="total-pedidos">Total de pedidos</label>
+                    <input id="total-pedidos" type="number">
+                  </div>
+                  <div class="form-group">
+                    <label for="total-volumes">Total de volumes</label>
+                    <input id="total-volumes" type="number">
+                  </div>
+                </div>
+
+                <div>
+                  <div class="form-group">
+                    <label for="destino">Destino / Cidade</label>
+                    <input id="destino" placeholder="Ex: São Paulo - SP">
+                  </div>
+                  <div class="form-group">
+                    <label for="status">Status da carga</label>
+                    <select id="status">
+                      <option value="aberto">ABERTO</option>
+                      <option value="fechado">FECHADO</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="observacao">Observações</label>
+                <textarea id="observacao" rows="2"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="problemas">Problemas</label>
+                <textarea id="problemas" rows="2"></textarea>
+              </div>
+
+              <button class="btn-primary" id="btn-salvar-carga">Salvar carga</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
